@@ -1,0 +1,12 @@
+spring:
+ application:
+   name: postal-legacy
+ cloud:
+   stream:
+     bindings:
+       eventOut:
+         contentType: avro/bytes
+         destination: eventQueue
+         producer:
+          requiredGroups: calculationConsumer
+          headerMode: raw
