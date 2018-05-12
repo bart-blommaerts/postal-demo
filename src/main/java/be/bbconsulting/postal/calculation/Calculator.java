@@ -1,18 +1,29 @@
 package be.bbconsulting.postal.calculation;
 
+import be.bbconsulting.postal.events.EventProducer;
+import be.bbconsulting.postal.events.RoundsRequestedEvent;
 import be.bbconsulting.postal.model.CalculationInfo;
 import be.bbconsulting.postal.model.CalculationResult;
 import be.bbconsulting.postal.model.FirstPart;
 import be.bbconsulting.postal.model.PostalInformation;
 import be.bbconsulting.postal.model.Round;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Component
 public class Calculator {
 
-    public List<Round> calculate(PostalInformation postalInformation) {
+    private EventProducer eventProducer;
 
+    public Calculator(EventProducer eventProducer) {
+        this.eventProducer = eventProducer;
+    }
+
+    public List<Round> calculate(PostalInformation postalInformation) {
         initiateCalculation();
 
         CalculationInfo calculationInfo = getCalculationInfo();
@@ -28,6 +39,15 @@ public class Calculator {
         CalculationResult result = calculateResult(moreCalculationInfo);
 
         return persistResult(result);
+    }
+
+    public void publishEvent(){
+        Map<String, Object> data = new HashMap<>();
+        data.put("roundFrequency", "daily");
+
+        RoundsRequestedEvent roundsRequestedEvent = new RoundsRequestedEvent(data);
+
+        eventProducer.publishEvent(roundsRequestedEvent);
     }
 
     private void initiateCalculation() {};
